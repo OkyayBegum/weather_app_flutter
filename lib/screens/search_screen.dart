@@ -1,24 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../providers/weather_provider.dart';
-import '../../widgets/weather_icon.dart';
+import '../providers/weather_provider.dart';
+import '../widgets/weather_icon.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+class SearchScreen extends StatefulWidget {
+  const SearchScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<SearchScreen> createState() => _SearchScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
-  final TextEditingController _cityController = TextEditingController(text: 'Istanbul');
+class _SearchScreenState extends State<SearchScreen> {
+  final TextEditingController _cityController =
+      TextEditingController(text: 'Istanbul');
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<WeatherProvider>(context, listen: false).fetchWeather(_cityController.text);
+      Provider.of<WeatherProvider>(context, listen: false)
+          .fetchWeather(_cityController.text);
     });
+  }
+
+  @override
+  void dispose() {
+    _cityController.dispose();
+    super.dispose();
   }
 
   @override
@@ -28,7 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: Colors.lightBlue[50],
       appBar: AppBar(
-        title: const Text('Weather App'),
+        title: const Text('Search City'),
         backgroundColor: Colors.lightBlueAccent,
       ),
       body: Padding(
@@ -39,13 +47,14 @@ class _HomeScreenState extends State<HomeScreen> {
               controller: _cityController,
               decoration: InputDecoration(
                 labelText: 'Enter city name',
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
               ),
             ),
             const SizedBox(height: 12),
             ElevatedButton(
               onPressed: () {
-                FocusScope.of(context).unfocus();
+                FocusScope.of(context).unfocus(); // klavye kapanır
                 weatherProvider.fetchWeather(_cityController.text.trim());
               },
               child: const Text('Search'),
@@ -58,18 +67,22 @@ class _HomeScreenState extends State<HomeScreen> {
                     : weatherProvider.errorMessage != null
                         ? Text(
                             weatherProvider.errorMessage!,
-                            style: const TextStyle(color: Colors.red, fontSize: 16),
+                            style: const TextStyle(
+                                color: Colors.red, fontSize: 16),
                           )
                         : weatherProvider.weather != null
                             ? Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   WeatherConditionIcon(
-                                    condition: weatherProvider.weather!.mainCondition,
+                                    condition:
+                                        weatherProvider.weather!.mainCondition,
                                   ),
                                   Text(
                                     weatherProvider.weather!.cityName,
-                                    style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                                    style: const TextStyle(
+                                        fontSize: 28,
+                                        fontWeight: FontWeight.bold),
                                   ),
                                   const SizedBox(height: 8),
                                   Text(
@@ -79,7 +92,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                   const SizedBox(height: 6),
                                   Text(
                                     weatherProvider.weather!.description,
-                                    style: const TextStyle(fontSize: 20, fontStyle: FontStyle.italic),
+                                    style: const TextStyle(
+                                        fontSize: 20,
+                                        fontStyle: FontStyle.italic),
                                   ),
                                 ],
                               )
