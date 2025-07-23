@@ -22,4 +22,24 @@ class WeatherService {
       return null;
     }
   }
+
+   Future<Map<String, dynamic>?> fetchWeatherByCoordinates(
+      double latitude, double longitude) async {
+    final url =
+        'https://api.openweathermap.org/data/2.5/weather?lat=$latitude&lon=$longitude&appid=$_apiKey&units=metric';
+
+    try {
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        print('API Error: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      print('Request error: $e');
+      return null;
+    }
+  }
 }

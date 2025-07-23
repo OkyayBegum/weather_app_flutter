@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../core/services/weather_service.dart';
 import '../models/weather_model.dart';
+import '../core/services/location_service.dart';
+
 
 class WeatherProvider extends ChangeNotifier {
   final WeatherService _weatherService = WeatherService();
@@ -33,4 +35,32 @@ class WeatherProvider extends ChangeNotifier {
     _isLoading = false;
     notifyListeners();
   }
+Future<void> fetchWeatherForCurrentLocation() async {
+  _isLoading = true;
+  _errorMessage = null;
+  _weather = null;
+  notifyListeners();
+
+  final locationService = LocationService();
+  final locationData = await locationService.getLocation();
+
+  if (locationData != null) {
+    final data = await WeatherService().fetchWeatherByCoordinates(
+      locationData.latitude!,
+      locationData.longitude!,
+    );
+
+    if (data != null) {
+      _weather = Weather.fromJson(data);
+      _errorMessage = null;
+    } else {
+      _errorMessage = 'Konuma göre hava durumu alinamadi.';
+    }
+  } else {
+    _errorMessage = 'Konum bilgisi alinamadi.';
+  }
+
+  _isLoading = false;
+  notifyListeners();
+}
 }
