@@ -4,6 +4,8 @@ import 'providers/weather_provider.dart';
 import 'screens/home_screen.dart';
 import 'screens/search_screen.dart';
 import 'screens/settings_screen.dart';
+import 'providers/settings_provider.dart';
+
 
 
 void main() {
@@ -11,28 +13,41 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => WeatherProvider()),
+        ChangeNotifierProvider(create: (_) => SettingsProvider()), // 🔥 EKLENDİ
       ],
       child: const WeatherApp(),
     ),
   );
 }
 
+
 class WeatherApp extends StatelessWidget {
   const WeatherApp({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final settings = Provider.of<SettingsProvider>(context).settings;
+
     return MaterialApp(
       title: 'Weather App',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
         colorSchemeSeed: Colors.blue,
+        brightness: Brightness.light,
       ),
+      darkTheme: ThemeData(
+        useMaterial3: true,
+        colorSchemeSeed: Colors.blue,
+        brightness: Brightness.dark,
+      ),
+      themeMode: settings.isDarkMode ? ThemeMode.dark : ThemeMode.light,
+      locale: Locale(settings.languageCode),
       home: const MainScreen(),
     );
   }
 }
+
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
