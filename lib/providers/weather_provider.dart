@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import '../core/services/weather_service.dart';
 import '../models/weather_model.dart';
+import '../models/forecast_model.dart';
 import '../core/services/location_service.dart';
-
 
 class WeatherProvider extends ChangeNotifier {
   final WeatherService _weatherService = WeatherService();
 
   Weather? _weather;
   Weather? get weather => _weather;
+
+  List<Forecast> _forecastList = [];
+  List<Forecast> get forecastList => _forecastList;
 
   bool _isLoading = false;
   bool get isLoading => _isLoading;
@@ -22,45 +25,61 @@ class WeatherProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final data = await _weatherService.fetchWeather(city);
-      if (data != null) {
-        _weather = Weather.fromJson(data);
+      final weatherData = await _weatherService.fetchWeather(city);
+      final forecastData = await _weatherService.fetchFiveDayForecast(city);
+
+      if (weatherData != null) {
+        _weather = Weather.fromJson(weatherData);
       } else {
         _errorMessage = 'Weather data not found.';
       }
+
+      if (forecastData != null) {
+        _forecastList = forecastData
+            .where((item) => item['dt_txt'].contains('12:00:00'))
+            .map<Forecast>((item) => Forecast.fromJson(item))
+            .toList();
+      } else {
+        _forecastList = [];
+      }
     } catch (e) {
       _errorMessage = 'Failed to fetch weather data.';
+      _forecastList = [];
     }
 
     _isLoading = false;
     notifyListeners();
   }
-Future<void> fetchWeatherForCurrentLocation() async {
-  _isLoading = true;
-  _errorMessage = null;
-  _weather = null;
-  notifyListeners();
 
-  final locationService = LocationService();
-  final locationData = await locationService.getLocation();
+  Future<void> fetchWeatherForCurrentLocation() async {
+    _isLoading = true;
+    _errorMessage = null;
+    _weather = null;
+    notifyListeners();
 
-  if (locationData != null) {
-    final data = await WeatherService().fetchWeatherByCoordinates(
-      locationData.latitude!,
-      locationData.longitude!,
-    );
+    try {
+      final locationService = LocationService();
+      final locationData = await locationService.getLocation();
 
-    if (data != null) {
-      _weather = Weather.fromJson(data);
-      _errorMessage = null;
-    } else {
-      _errorMessage = 'Konuma göre hava durumu alinamadi.';
+      if (locationData != null) {
+        final data = await _weatherService.fetchWeatherByCoordinates(
+          locationData.latitude!,
+          locationData.longitude!,
+        );
+
+        if (data != null) {
+          _weather = Weather.fromJson(data);
+        } else {
+          _errorMessage = 'Konuma göre hava durumu alınamadı.';
+        }
+      } else {
+        _errorMessage = 'Konum bilgisi alınamadı.';
+      }
+    } catch (e) {
+      _errorMessage = 'Konuma göre veri alınamadı.';
     }
-  } else {
-    _errorMessage = 'Konum bilgisi alinamadi.';
-  }
 
-  _isLoading = false;
-  notifyListeners();
-}
+    _isLoading = false;
+    notifyListeners();
+  }
 }
