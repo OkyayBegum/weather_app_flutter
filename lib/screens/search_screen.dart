@@ -93,14 +93,15 @@ class _SearchScreenState extends State<SearchScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Row(
-                  children: const [
+                  children: [
                     Text(
                       '🌍 Search Weather',
                       style: TextStyle(
-                        fontSize: 26,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
+                          fontSize: 26,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white
+                              : Colors.black87),
                     ),
                   ],
                 ),
@@ -113,8 +114,11 @@ class _SearchScreenState extends State<SearchScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: TextField(
                     controller: _cityController,
+                    style: TextStyle(color: Colors.black87),
+                    cursorColor: Colors.black,
                     decoration: const InputDecoration(
                       hintText: 'Istanbul',
+                      hintStyle: TextStyle(color: Colors.black54),
                       border: InputBorder.none,
                       icon: Icon(Icons.search),
                     ),
@@ -158,7 +162,10 @@ class _SearchScreenState extends State<SearchScreen> {
                                   children: [
                                     Card(
                                       elevation: 6,
-                                      color: Colors.white.withOpacity(0.85),
+                                      color: Theme.of(context).brightness ==
+                                              Brightness.dark
+                                          ? Colors.black54
+                                          : Colors.white,
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(16),
                                       ),
@@ -169,11 +176,14 @@ class _SearchScreenState extends State<SearchScreen> {
                                             Container(
                                               height: 100,
                                               decoration: BoxDecoration(
-                                                color: getLottieBackground(weather.mainCondition),
-                                                borderRadius: BorderRadius.circular(12),
+                                                color: getLottieBackground(
+                                                    weather.mainCondition),
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
                                               ),
                                               child: Lottie.asset(
-                                                getLottiePath(weather.mainCondition),
+                                                getLottiePath(
+                                                    weather.mainCondition),
                                                 fit: BoxFit.contain,
                                               ),
                                             ),
@@ -203,15 +213,31 @@ class _SearchScreenState extends State<SearchScreen> {
                                             ),
                                             const SizedBox(height: 16),
                                             Wrap(
-                                              alignment: WrapAlignment.spaceEvenly,
+                                              alignment:
+                                                  WrapAlignment.spaceEvenly,
                                               spacing: 24,
                                               runSpacing: 16,
                                               children: [
-                                                _buildInfoTile(Icons.thermostat, 'Feels like', '${weather.feelsLike} °C'),
-                                                _buildInfoTile(Icons.water_drop, 'Humidity', '${weather.humidity}%'),
-                                                _buildInfoTile(Icons.air, 'Wind', '${weather.windSpeed} m/s'),
-                                                _buildInfoTile(Icons.compress, 'Pressure', '${weather.pressure} hPa'),
-                                                _buildInfoTile(Icons.wb_sunny, 'UV Index', '${weather.uvIndex}'),
+                                                _buildInfoTile(
+                                                    Icons.thermostat,
+                                                    'Feels like',
+                                                    '${weather.feelsLike} °C'),
+                                                _buildInfoTile(
+                                                    Icons.water_drop,
+                                                    'Humidity',
+                                                    '${weather.humidity}%'),
+                                                _buildInfoTile(
+                                                    Icons.air,
+                                                    'Wind',
+                                                    '${weather.windSpeed} m/s'),
+                                                _buildInfoTile(
+                                                    Icons.compress,
+                                                    'Pressure',
+                                                    '${weather.pressure} hPa'),
+                                                _buildInfoTile(
+                                                    Icons.wb_sunny,
+                                                    'UV Index',
+                                                    '${weather.uvIndex}'),
                                               ],
                                             ),
                                           ],
@@ -232,12 +258,16 @@ class _SearchScreenState extends State<SearchScreen> {
                                         ? Column(
                                             children: forecastList.map((f) {
                                               return Card(
-                                                margin: const EdgeInsets.symmetric(vertical: 8),
+                                                margin:
+                                                    const EdgeInsets.symmetric(
+                                                        vertical: 8),
                                                 child: ListTile(
                                                   leading: Image.network(
                                                     'https://openweathermap.org/img/wn/${f.iconCode}@2x.png',
                                                   ),
-                                                  title: Text(DateFormat('EEE, d MMM').format(f.date)),
+                                                  title: Text(
+                                                      DateFormat('EEE, d MMM')
+                                                          .format(f.date)),
                                                   subtitle: Text(
                                                     '${f.temp.toStringAsFixed(1)} °C - ${f.description}',
                                                   ),
@@ -247,7 +277,8 @@ class _SearchScreenState extends State<SearchScreen> {
                                           )
                                         : const Text(
                                             'Tahmin verisi yok.',
-                                            style: TextStyle(color: Colors.white),
+                                            style:
+                                                TextStyle(color: Colors.white),
                                           ),
                                   ],
                                 )
@@ -266,8 +297,19 @@ class _SearchScreenState extends State<SearchScreen> {
       children: [
         Icon(icon, size: 28),
         const SizedBox(height: 4),
-        Text(label, style: const TextStyle(fontSize: 14)),
-        Text(value, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+        Text(label,
+            style: TextStyle(
+                fontSize: 14,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white
+                    : Colors.black54)),
+        Text(value,
+            style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white
+                    : Colors.black87)),
       ],
     );
   }
