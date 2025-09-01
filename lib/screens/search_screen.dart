@@ -6,6 +6,7 @@ import '../providers/weather_provider.dart';
 import '../utils/background_helper.dart';
 import '../models/weather_model.dart';
 import '../models/forecast_model.dart';
+import '../providers/settings_provider.dart';
 
 String getLottiePath(String condition) {
   switch (condition.toLowerCase()) {
@@ -70,6 +71,13 @@ class _SearchScreenState extends State<SearchScreen> {
     final provider = Provider.of<WeatherProvider>(context);
     final weather = provider.weather;
     final forecastList = provider.forecastList;
+    final settings = Provider.of<SettingsProvider>(context).settings;
+    final isCelsius = settings.isCelsius;
+
+    final temperature = weather != null
+        ? (isCelsius ? weather.temperature : (weather.temperature * 9 / 5) + 32)
+        : 0;
+    final unit = isCelsius ? '°C' : '°F';
 
     final backgroundImage = weather != null
         ? AssetImage(getBackgroundImage(weather.mainCondition))
@@ -197,7 +205,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                             ),
                                             const SizedBox(height: 10),
                                             Text(
-                                              '${weather.temperature.toStringAsFixed(1)} °C',
+                                              '${temperature.toStringAsFixed(1)} $unit',
                                               style: const TextStyle(
                                                 fontSize: 48,
                                                 fontWeight: FontWeight.bold,
@@ -221,7 +229,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                                 _buildInfoTile(
                                                     Icons.thermostat,
                                                     'Feels like',
-                                                    '${weather.feelsLike} °C'),
+                                                    '${(isCelsius ? weather.feelsLike : (weather.feelsLike * 9 / 5 + 32)).toStringAsFixed(1)}$unit'),
                                                 _buildInfoTile(
                                                     Icons.water_drop,
                                                     'Humidity',
