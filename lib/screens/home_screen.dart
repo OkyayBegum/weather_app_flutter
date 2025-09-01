@@ -4,6 +4,7 @@ import 'package:lottie/lottie.dart';
 import '../providers/weather_provider.dart';
 import '../providers/settings_provider.dart';
 import '../utils/background_helper.dart';
+import 'package:location/location.dart';
 
 String getLottiePath(String condition) {
   switch (condition.toLowerCase()) {
@@ -59,6 +60,13 @@ class _HomeScreenState extends State<HomeScreen> {
         ? AssetImage(getBackgroundImage(weather.mainCondition))
         : null;
 
+    void fakeLocationCheck() async {
+      Location location = Location();
+      // Sadece bu satır çalışsın yeter, izin istemez:
+      var status = await location.hasPermission();
+      print('İzin durumu: $status');
+    }
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       body: weather == null && !provider.isLoading
@@ -79,14 +87,20 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: [
                         ShaderMask(
                           shaderCallback: (bounds) => const LinearGradient(
-                            colors: [Colors.blue, Colors.purple],
+                            colors: [
+                              Color(0xFFE0E0E0), // Açık gri ton (almost white)
+                              Color(0xFFFFFFFF), // Saf beyaz
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
                           ).createShader(bounds),
                           child: const Text(
-                            'My Weather',
+                            'Weather App',
                             style: TextStyle(
                               fontSize: 36,
                               fontWeight: FontWeight.bold,
-                              color: Colors.white, // Maskelenecek
+                              color: Colors.white,
+                              letterSpacing: 2,
                             ),
                           ),
                         ),
@@ -109,7 +123,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(16),
                                 ),
-                                color: Colors.grey.shade200.withOpacity(0.85),
+                                color: Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? Colors.black54
+                                    : Colors.white,
                                 margin:
                                     const EdgeInsets.symmetric(horizontal: 8),
                                 child: Padding(
@@ -125,8 +142,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                               BorderRadius.circular(12),
                                         ),
                                         child: Lottie.asset(
-                                          getLottiePath(
-                                              weather!.mainCondition),
+                                          getLottiePath(weather!.mainCondition),
                                           fit: BoxFit.contain,
                                         ),
                                       ),
@@ -211,17 +227,27 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _infoColumn(
-      {required IconData icon,
-      required String label,
-      required String value}) {
+      {required IconData icon, required String label, required String value}) {
     return Column(
       children: [
-        Icon(icon, color: Colors.black87),
+        Icon(icon,
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.white
+                : Colors.black87),
         const SizedBox(height: 4),
         Text(label,
-            style: const TextStyle(fontSize: 12, color: Colors.black54)),
+            style: TextStyle(
+                fontSize: 12,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white
+                    : Colors.black87)),
         Text(value,
-            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+            style: TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 14,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white
+                    : Colors.black87)),
       ],
     );
   }

@@ -13,7 +13,7 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => WeatherProvider()),
-        ChangeNotifierProvider(create: (_) => SettingsProvider()), // 🔥 EKLENDİ
+        ChangeNotifierProvider(create: (_) => SettingsProvider()), 
       ],
       child: const WeatherApp(),
     ),
